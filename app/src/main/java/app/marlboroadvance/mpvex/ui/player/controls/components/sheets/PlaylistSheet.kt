@@ -44,6 +44,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -463,6 +466,7 @@ fun PlaylistTrackListItem(
       )
       .clip(RoundedCornerShape(12.dp))
       .then(borderModifier)
+      .semantics { this.selected = item.isPlaying }
       .clickable(onClick = onClick),
     color = if (item.isPlaying) {
       MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f)
@@ -660,6 +664,7 @@ fun PlaylistTrackGridItem(
       .width(200.dp)
       .clip(RoundedCornerShape(12.dp))
       .then(borderModifier)
+      .semantics { this.selected = item.isPlaying }
       .clickable(onClick = onClick),
     color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
     shape = RoundedCornerShape(12.dp),

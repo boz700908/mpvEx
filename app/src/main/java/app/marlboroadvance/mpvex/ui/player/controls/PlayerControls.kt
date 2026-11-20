@@ -75,6 +75,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import app.marlboroadvance.mpvex.accessibility.rememberTouchExplorationEnabled
+
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -239,6 +241,8 @@ fun PlayerControls(
 
   var isUnlockSliderDragging by remember { mutableStateOf(false) }
 
+  val touchExplorationEnabled by rememberTouchExplorationEnabled()
+
   LaunchedEffect(
     controlsShown,
     paused,
@@ -247,7 +251,9 @@ fun PlayerControls(
     areControlsLocked,
     isUnlockSliderDragging,
   ) {
-    if (controlsShown && paused == false && !isSeeking && !isUnlockSliderDragging) {
+    // Never fade the controls away from under a screen reader: they are the only way to operate
+    // the player once the gesture surface has been handed over.
+    if (controlsShown && paused == false && !isSeeking && !isUnlockSliderDragging && !touchExplorationEnabled) {
       // Use 2 second delay when controls are locked, otherwise use user preference
       val delayTime = if (areControlsLocked) 2000L else playerTimeToDisappear.toLong()
       delay(delayTime)

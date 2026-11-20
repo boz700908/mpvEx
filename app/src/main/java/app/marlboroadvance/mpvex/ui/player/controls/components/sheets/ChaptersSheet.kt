@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +74,8 @@ fun ChapterTrack(
     modifier =
       modifier
         .fillMaxWidth()
+        // One node: the chapter row reports its own name, time and whether it is playing.
+        .semantics(mergeDescendants = true) { this.selected = selected }
         .clickable(onClick = onClick)
         .padding(vertical = MaterialTheme.spacing.smaller, horizontal = MaterialTheme.spacing.medium),
     horizontalArrangement = Arrangement.SpaceBetween,
