@@ -2628,7 +2628,9 @@ class PlayerActivity :
       }
 
       else -> {
-        event?.let { player.onKey(it) }
+        // mpv has its own key bindings (seek, speed, subtitles). Consume the key when mpv takes it,
+        // otherwise the same press also walks the Compose focus tree underneath.
+        if (event != null && player.onKey(event)) return true
         return super.onKeyDown(keyCode, event)
       }
     }
