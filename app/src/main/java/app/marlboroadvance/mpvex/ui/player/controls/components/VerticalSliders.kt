@@ -27,6 +27,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import app.marlboroadvance.mpvex.accessibility.clearOverlaySemantics
+import app.marlboroadvance.mpvex.accessibility.rememberStatusAnnouncer
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -145,8 +148,13 @@ fun BrightnessSlider(
   modifier: Modifier = Modifier,
 ) {
   val coercedBrightness = brightness.coerceIn(range)
+  val brightnessPercent = (coercedBrightness * 100).toInt()
+  val announcer = rememberStatusAnnouncer()
+  LaunchedEffect(brightnessPercent) {
+    announcer.announce("Brightness $brightnessPercent percent")
+  }
   Surface(
-    modifier = modifier,
+    modifier = modifier.clearOverlaySemantics(),
     shape = RoundedCornerShape(20.dp),
     color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.55f),
     contentColor = MaterialTheme.colorScheme.onSurface,
@@ -190,8 +198,12 @@ fun VolumeSlider(
   displayAsPercentage: Boolean = false,
 ) {
   val percentage = (percentage(volume, range) * 100).roundToInt()
+  val announcer = rememberStatusAnnouncer()
+  LaunchedEffect(percentage) {
+    announcer.announce("Volume $percentage percent")
+  }
   Surface(
-    modifier = modifier,
+    modifier = modifier.clearOverlaySemantics(),
     shape = RoundedCornerShape(20.dp),
     color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.55f),
     contentColor = MaterialTheme.colorScheme.onSurface,

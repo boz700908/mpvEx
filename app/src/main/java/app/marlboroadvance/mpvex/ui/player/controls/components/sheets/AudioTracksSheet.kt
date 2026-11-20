@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -123,6 +125,8 @@ fun AudioTrackRow(
     modifier =
       modifier
         .fillMaxWidth()
+        // One node: the row is the radio button, so the name and the current track are read together.
+        .semantics(mergeDescendants = true) { selected = isSelected }
         .clickable(onClick = onClick)
         .padding(
           horizontal = MaterialTheme.spacing.medium,

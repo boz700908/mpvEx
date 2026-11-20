@@ -64,6 +64,8 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import app.marlboroadvance.mpvex.accessibility.clearOverlaySemantics
+import app.marlboroadvance.mpvex.accessibility.rememberStatusAnnouncer
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -426,6 +428,21 @@ fun PlayerControls(
         val currentAspectRatio by viewModel.currentAspectRatio.collectAsState()
         val videoZoom by viewModel.videoZoom.collectAsState()
 
+        // The overlay below is visual only; whatever it shows is spoken through the announcer.
+        val statusAnnouncer = rememberStatusAnnouncer()
+        val aspectLabel = stringResource(aspectRatio.titleRes)
+        LaunchedEffect(currentPlayerUpdate, videoZoom, aspectLabel) {
+          statusAnnouncer.announce(
+            describePlayerUpdate(
+              update = currentPlayerUpdate,
+              videoZoom = videoZoom,
+              aspectLabel = aspectLabel,
+              playlistMode = playlistMode,
+              hasPlaylistSupport = viewModel.hasPlaylistSupport(),
+            ),
+          )
+        }
+
         LaunchedEffect(currentPlayerUpdate, aspectRatio, videoZoom) {
           if (currentPlayerUpdate is PlayerUpdates.MultipleSpeed ||
             currentPlayerUpdate is PlayerUpdates.DynamicSpeedControl ||
@@ -450,6 +467,7 @@ fun PlayerControls(
                   Modifier
                 }
               )
+              .clearOverlaySemantics()
               .constrainAs(playerUpdates) {
                 linkTo(parent.start, parent.end)
                 top.linkTo(parent.top, if (isPortrait) 104.dp else 64.dp)
@@ -1250,4 +1268,46 @@ fun PlayerControls(
       onDismissRequest = { onOpenPanel(Panels.None) },
     )
   }
+}
+
+/**
+ * Human sentence for a transient player update, or null when there is nothing worth saying.
+ *
+ * Mirrors the overlay rendered above so that a screen reader user hears exactly the feedback a
+ * sighted user sees.
+ */
+private fun describePlayerUpdate(
+  update: PlayerUpdates,
+  videoZoom: Float,
+  aspectLabel: String,
+  playlistMode: Boolean,
+  hasPlaylistSupport: Boolean,
+): String? =
+  when (update) {
+    PlayerUpdates.None -> null
+    PlayerUpdates.MultipleSpeed -> "Temporary speed boost"
+    is PlayerUpdates.DynamicSpeedControl -> "Speed ${formatSpeedValue(update.speed)}"
+    PlayerUpdates.AspectRatio -> "Aspect ratio $aspectLabel"
+    PlayerUpdates.VideoZoom -> "Zoom ${(videoZoom * 100).toInt()} percent"
+    is PlayerUpdates.HorizontalSeek -> "${update.currentTime} ${update.seekDelta}"
+    is PlayerUpdates.ShowText -> update.value
+    is PlayerUpdates.RepeatMode ->
+      when (update.mode) {
+        app.marlboroadvance.mpvex.ui.player.RepeatMode.OFF -> "Repeat off"
+        app.marlboroadvance.mpvex.ui.player.RepeatMode.ONE -> "Repeat this file"
+        app.marlboroadvance.mpvex.ui.player.RepeatMode.ALL ->
+          if (playlistMode && hasPlaylistSupport) "Repeat playlist" else "Repeat this file"
+      }
+    is PlayerUpdates.Shuffle -> if (update.enabled) "Shuffle on" else "Shuffle off"
+    is PlayerUpdates.FrameInfo ->
+      if (update.totalFrames > 0) {
+        "Frame ${update.currentFrame} of ${update.totalFrames}"
+      } else {
+        "Frame ${update.currentFrame}"
+      }
+  }
+
+private fun formatSpeedValue(speed: Float): String {
+  val rounded = (speed * 100).toInt() / 100.0
+  return if (rounded == rounded.toInt().toDouble()) "${rounded.toInt()} times" else "$rounded times"
 }
