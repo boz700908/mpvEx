@@ -77,7 +77,7 @@ fun MultiCardPanel(
           },
           navigationIcon = {
             IconButton(onClick = onDismissRequest) {
-              Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+              Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Close")
             }
           },
           colors = TopAppBarDefaults.topAppBarColors().copy(containerColor = Color.Transparent),
@@ -119,7 +119,7 @@ fun MultiCardPanel(
               ),
           )
           IconButton(onDismissRequest) {
-            Icon(imageVector = Icons.Default.Close, contentDescription = null)
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
           }
         }
         repeat(cardCount) { cards(it, Modifier) }

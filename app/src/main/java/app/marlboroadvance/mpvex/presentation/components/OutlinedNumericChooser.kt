@@ -48,7 +48,7 @@ fun OutlinedNumericChooser(
       onClick = { onChange(value - step) },
       modifier = Modifier.size(48.dp)
     ) {
-      Icon(decreaseIcon, null)
+      Icon(decreaseIcon, "Decrease")
     }
     var valueString by remember { mutableStateOf("$value") }
     LaunchedEffect(value) {
@@ -82,7 +82,7 @@ fun OutlinedNumericChooser(
       onClick = { onChange(value + step) },
       modifier = Modifier.size(48.dp)
     ) {
-      Icon(increaseIcon, null)
+      Icon(increaseIcon, "Increase")
     }
   }
 }
@@ -111,7 +111,7 @@ fun OutlinedNumericChooser(
       onClick = { onChange(value - step) },
       modifier = Modifier.size(48.dp)
     ) {
-      Icon(decreaseIcon, null)
+      Icon(decreaseIcon, "Decrease")
     }
     var valueString by remember { mutableStateOf("$value") }
     LaunchedEffect(value) {
@@ -147,7 +147,7 @@ fun OutlinedNumericChooser(
       onClick = { onChange(value + step) },
       modifier = Modifier.size(48.dp)
     ) {
-      Icon(increaseIcon, null)
+      Icon(increaseIcon, "Increase")
     }
   }
 }

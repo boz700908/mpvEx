@@ -115,7 +115,7 @@ object AboutScreen : Screen {
             IconButton(onClick = backstack::removeLastOrNull) {
               Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack, 
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = MaterialTheme.colorScheme.secondary,
               )
             }
@@ -507,7 +507,7 @@ object LibrariesScreen : Screen {
             IconButton(onClick = backstack::removeLastOrNull) {
               Icon(
                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = MaterialTheme.colorScheme.primary,
               )
             }

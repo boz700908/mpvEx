@@ -60,7 +60,7 @@ object AudioPreferencesScreen : Screen {
             IconButton(onClick = backstack::removeLastOrNull) {
               Icon(
                 Icons.AutoMirrored.Default.ArrowBack, 
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = MaterialTheme.colorScheme.secondary,
               )
             }

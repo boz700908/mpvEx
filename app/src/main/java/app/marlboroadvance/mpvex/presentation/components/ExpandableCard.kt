@@ -80,7 +80,7 @@ fun ExpandableCard(
         modifier = Modifier.rotate(rotationState),
         onClick = { onExpand(!isExpanded) },
       ) {
-        Icon(Icons.Default.ArrowDropDown, null)
+        Icon(Icons.Default.ArrowDropDown, if (isExpanded) "Collapse" else "Expand")
       }
     }
     Box(

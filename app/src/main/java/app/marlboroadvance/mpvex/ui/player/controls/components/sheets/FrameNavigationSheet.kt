@@ -559,7 +559,7 @@ private fun FrameNavigationCardTitle(
     IconButton(onClose) {
       Icon(
         Icons.Default.Close,
-        null,
+        "Close",
         modifier = Modifier.size(32.dp),
       )
     }

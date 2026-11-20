@@ -77,7 +77,7 @@ object AppearancePreferencesScreen : Screen {
                         IconButton(onClick = backstack::removeLastOrNull) {
                             Icon(
                                 Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = null,
+                                contentDescription = "Back",
                                 tint = MaterialTheme.colorScheme.secondary,
                             )
                         }

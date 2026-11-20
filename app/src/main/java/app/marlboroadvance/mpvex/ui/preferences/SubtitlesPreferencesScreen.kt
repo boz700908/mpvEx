@@ -95,7 +95,7 @@ object SubtitlesPreferencesScreen : Screen {
             ) {
               Icon(
                 Icons.AutoMirrored.Outlined.ArrowBack,
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = MaterialTheme.colorScheme.secondary,
               )
             }

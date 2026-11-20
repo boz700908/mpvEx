@@ -149,7 +149,7 @@ fun PlaybackSpeedSheet(
            onClick = { onSpeedChange((speed - 0.05f).coerceAtLeast(0.05f)) },
            modifier = Modifier.size(40.dp)
         ) {
-           Icon(Icons.Default.Remove, null, modifier = Modifier.size(24.dp))
+           Icon(Icons.Default.Remove, "Slower", modifier = Modifier.size(24.dp))
         }
 
           Slider(
@@ -167,7 +167,7 @@ fun PlaybackSpeedSheet(
            onClick = { onSpeedChange((speed + 0.05f).coerceAtMost(4.0f)) },
            modifier = Modifier.size(40.dp)
         ) {
-           Icon(Icons.Default.Add, null, modifier = Modifier.size(24.dp))
+           Icon(Icons.Default.Add, "Faster", modifier = Modifier.size(24.dp))
         }
       }
 
