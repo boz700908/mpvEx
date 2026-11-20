@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.marlboroadvance.mpvex.R
+import app.marlboroadvance.mpvex.preferences.AccessibilityPreferences
 import app.marlboroadvance.mpvex.preferences.SubtitlesPreferences
 import app.marlboroadvance.mpvex.preferences.preference.collectAsState
 import app.marlboroadvance.mpvex.presentation.Screen
@@ -74,6 +75,7 @@ object SubtitlesPreferencesScreen : Screen {
     val context = LocalContext.current
     val backstack = LocalBackStack.current
     val preferences = koinInject<SubtitlesPreferences>()
+    val accessibilityPreferences = koinInject<AccessibilityPreferences>()
     val fileManager = koinInject<FileManager>()
 
     Scaffold(
@@ -156,6 +158,74 @@ object SubtitlesPreferencesScreen : Screen {
           // === GENERAL SECTION ===
           item {
             PreferenceSectionHeader(title = stringResource(R.string.general))
+          }
+
+          // === SCREEN READER SECTION ===
+          item {
+            PreferenceSectionHeader(title = stringResource(R.string.a11y_section_title))
+          }
+
+          item {
+            PreferenceCard {
+
+              val announceSubtitles by accessibilityPreferences.announceSubtitles.collectAsState()
+              SwitchPreference(
+                value = announceSubtitles,
+                onValueChange = { accessibilityPreferences.announceSubtitles.set(it) },
+                title = { Text(stringResource(R.string.pref_a11y_announce_subtitles_title)) },
+                summary = {
+                  Text(
+                    stringResource(R.string.pref_a11y_announce_subtitles_summary),
+                    color = MaterialTheme.colorScheme.outline,
+                  )
+                },
+              )
+
+              PreferenceDivider()
+
+              val announceSecondary by accessibilityPreferences.announceSecondarySubtitles.collectAsState()
+              SwitchPreference(
+                value = announceSecondary,
+                onValueChange = { accessibilityPreferences.announceSecondarySubtitles.set(it) },
+                title = { Text(stringResource(R.string.pref_a11y_announce_secondary_title)) },
+                summary = {
+                  Text(
+                    stringResource(R.string.pref_a11y_announce_secondary_summary),
+                    color = MaterialTheme.colorScheme.outline,
+                  )
+                },
+              )
+
+              PreferenceDivider()
+
+              val interrupt by accessibilityPreferences.interruptOnNewSubtitle.collectAsState()
+              SwitchPreference(
+                value = interrupt,
+                onValueChange = { accessibilityPreferences.interruptOnNewSubtitle.set(it) },
+                title = { Text(stringResource(R.string.pref_a11y_interrupt_title)) },
+                summary = {
+                  Text(
+                    stringResource(R.string.pref_a11y_interrupt_summary),
+                    color = MaterialTheme.colorScheme.outline,
+                  )
+                },
+              )
+
+              PreferenceDivider()
+
+              val onlyWhenVisible by accessibilityPreferences.announceOnlyWhenSubtitlesVisible.collectAsState()
+              SwitchPreference(
+                value = onlyWhenVisible,
+                onValueChange = { accessibilityPreferences.announceOnlyWhenSubtitlesVisible.set(it) },
+                title = { Text(stringResource(R.string.pref_a11y_only_when_visible_title)) },
+                summary = {
+                  Text(
+                    stringResource(R.string.pref_a11y_only_when_visible_summary),
+                    color = MaterialTheme.colorScheme.outline,
+                  )
+                },
+              )
+            }
           }
 
           item {

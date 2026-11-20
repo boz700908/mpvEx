@@ -62,6 +62,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -77,12 +78,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.marlboroadvance.mpvex.preferences.PlayerButton
+import app.marlboroadvance.mpvex.preferences.getPlayerButtonLabel
 import app.marlboroadvance.mpvex.ui.player.Panels
 import app.marlboroadvance.mpvex.ui.player.PlayerActivity
 import app.marlboroadvance.mpvex.ui.player.PlayerViewModel
 import app.marlboroadvance.mpvex.ui.player.Sheets
 import app.marlboroadvance.mpvex.ui.player.VideoAspect
 import app.marlboroadvance.mpvex.ui.player.controls.components.ControlsButton
+import app.marlboroadvance.mpvex.ui.player.controls.components.LocalPlayerButtonLabel
 import app.marlboroadvance.mpvex.ui.player.controls.components.CurrentChapter
 import app.marlboroadvance.mpvex.ui.theme.controlColor
 import app.marlboroadvance.mpvex.ui.theme.spacing
@@ -109,6 +112,7 @@ fun RenderPlayerButton(
   buttonSize: Dp = 40.dp,
 ) {
   val clickEvent = LocalPlayerButtonsClickEvent.current
+  CompositionLocalProvider(LocalPlayerButtonLabel provides getPlayerButtonLabel(button)) {
   when (button) {
     PlayerButton.BACK_ARROW -> {
       ControlsButton(
@@ -845,5 +849,6 @@ fun RenderPlayerButton(
 
     PlayerButton.NONE -> { /* Do nothing */
     }
+  }
   }
 }

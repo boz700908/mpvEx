@@ -1,6 +1,7 @@
 package app.marlboroadvance.mpvex.di
 
 import app.marlboroadvance.mpvex.database.MpvExDatabase
+import app.marlboroadvance.mpvex.preferences.AccessibilityPreferences
 import app.marlboroadvance.mpvex.preferences.AdvancedPreferences
 import app.marlboroadvance.mpvex.preferences.AppearancePreferences
 import app.marlboroadvance.mpvex.preferences.AudioPreferences
@@ -31,5 +32,6 @@ val PreferencesModule =
     singleOf(::AdvancedPreferences)
     single { BrowserPreferences(get(), androidContext()) }
     singleOf(::FoldersPreferences)
+    singleOf(::AccessibilityPreferences)
     singleOf(::SettingsManager)
   }

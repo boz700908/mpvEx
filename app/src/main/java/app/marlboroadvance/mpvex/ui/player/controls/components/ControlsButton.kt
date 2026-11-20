@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,6 +31,14 @@ import app.marlboroadvance.mpvex.preferences.preference.collectAsState
 import app.marlboroadvance.mpvex.ui.player.controls.LocalPlayerButtonsClickEvent
 import app.marlboroadvance.mpvex.ui.theme.spacing
 import org.koin.compose.koinInject
+
+/**
+ * Label for the button currently being drawn, provided by whoever knows which player button it is.
+ *
+ * The control bar builds its buttons from an enum and passes only an icon, so without this every
+ * button would be an unlabelled clickable with no way for a screen reader to tell them apart.
+ */
+val LocalPlayerButtonLabel = compositionLocalOf<String?> { null }
 
 @Suppress("ModifierClickableOrder")
 @OptIn(ExperimentalFoundationApi::class)
@@ -77,7 +86,7 @@ fun ControlsButton(
   ) {
     Icon(
       imageVector = icon,
-      contentDescription = title,
+      contentDescription = title ?: LocalPlayerButtonLabel.current,
       tint = color ?: MaterialTheme.colorScheme.onSurface,
       modifier =
         Modifier

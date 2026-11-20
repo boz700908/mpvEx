@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import `is`.xyz.mpv.MPVLib
+import app.marlboroadvance.mpvex.accessibility.rememberTouchExplorationEnabled
 import app.marlboroadvance.mpvex.preferences.AudioPreferences
 import app.marlboroadvance.mpvex.preferences.GesturePreferences
 import app.marlboroadvance.mpvex.preferences.PlayerPreferences
@@ -83,6 +85,9 @@ fun GestureHandler(
   val playerPreferences = koinInject<PlayerPreferences>()
   val audioPreferences = koinInject<AudioPreferences>()
   val gesturePreferences = koinInject<GesturePreferences>()
+  // With a screen reader running the gestures below must not fire: a double tap means
+  // "activate" there, and a drag means "move focus".
+  val touchExplorationEnabled by rememberTouchExplorationEnabled()
   val panelShown by viewModel.panelShown.collectAsState()
   val allowGesturesInPanels by playerPreferences.allowGesturesInPanels.collectAsState()
   val paused by MPVLib.propBoolean["pause"].collectAsState()
@@ -127,6 +132,12 @@ fun GestureHandler(
   val volumeBoostingCap = audioPreferences.volumeBoostCap.get()
   val haptics = LocalHapticFeedback.current
   val coroutineScope = rememberCoroutineScope()
+
+  // Controls are the only way to operate the player without gestures, so reveal them rather than
+  // leaving the reader on an empty surface.
+  LaunchedEffect(touchExplorationEnabled) {
+    if (touchExplorationEnabled) viewModel.showControls()
+  }
 
   // Isolated double-tap state tracking
   var tapCount by remember { mutableStateOf(0) }
@@ -186,9 +197,15 @@ fun GestureHandler(
     modifier = modifier
       .fillMaxSize()
       .padding(horizontal = 48.dp, vertical = 48.dp)
-      .pointerInput(areControlsLocked, doubleTapSeekAreaWidth, gesturePreferences, isVerticalGestureActive) {
+      .pointerInput(areControlsLocked, doubleTapSeekAreaWidth, gesturePreferences, isVerticalGestureActive, touchExplorationEnabled) {
         // Isolated double-tap detection that doesn't interfere with other gestures
         if (isVerticalGestureActive) return@pointerInput
+        if (touchExplorationEnabled) {
+          // Exploring by touch: hand the whole surface to the reader and keep a single tap, which
+          // is what a double-tap-to-activate turns into, for revealing the controls.
+          detectTapGestures { viewModel.showControls() }
+          return@pointerInput
+        }
         awaitEachGesture {
           val down = awaitFirstDown(requireUnconsumed = false)
           val downPosition = down.position
@@ -330,6 +347,7 @@ fun GestureHandler(
       }
       .pointerInput(areControlsLocked, multipleSpeedGesture, brightnessGesture, volumeGesture) {
         if ((!brightnessGesture && !volumeGesture && multipleSpeedGesture <= 0f) || areControlsLocked) return@pointerInput
+        if (touchExplorationEnabled) return@pointerInput
 
         awaitEachGesture {
           val down = awaitFirstDown(requireUnconsumed = false)
@@ -635,6 +653,7 @@ fun GestureHandler(
       }
       .pointerInput(pinchToZoomGesture, panAndZoomEnabled, areControlsLocked, isVerticalGestureActive) {
         if (!pinchToZoomGesture || areControlsLocked || isVerticalGestureActive) return@pointerInput
+        if (touchExplorationEnabled) return@pointerInput
 
         // Helper: get video display dimensions at 1x (how mpv fits the video to screen)
         fun videoDisplaySize(): Pair<Float, Float> {
@@ -735,6 +754,7 @@ fun GestureHandler(
       // Single-finger pan (only when Pan & Zoom enabled and zoomed in)
       .pointerInput(panAndZoomEnabled, pinchToZoomGesture, areControlsLocked, isVerticalGestureActive) {
         if (!panAndZoomEnabled || !pinchToZoomGesture || areControlsLocked || isVerticalGestureActive) return@pointerInput
+        if (touchExplorationEnabled) return@pointerInput
 
         awaitEachGesture {
           val down = awaitFirstDown(requireUnconsumed = false)
@@ -803,6 +823,7 @@ fun GestureHandler(
       }
       .pointerInput(horizontalSwipeToSeek, areControlsLocked, gesturePreferences, isVerticalGestureActive) {
         if (!horizontalSwipeToSeek || areControlsLocked || isVerticalGestureActive) return@pointerInput
+        if (touchExplorationEnabled) return@pointerInput
 
         awaitEachGesture {
           val down = awaitFirstDown(requireUnconsumed = false)

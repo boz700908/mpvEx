@@ -35,9 +35,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
+import app.marlboroadvance.mpvex.accessibility.SubtitleAnnounceConfig
+import app.marlboroadvance.mpvex.accessibility.SubtitleAnnouncer
 import app.marlboroadvance.mpvex.database.entities.PlaybackStateEntity
 import app.marlboroadvance.mpvex.databinding.PlayerLayoutBinding
 import app.marlboroadvance.mpvex.domain.playbackstate.repository.PlaybackStateRepository
+import app.marlboroadvance.mpvex.preferences.AccessibilityPreferences
 import app.marlboroadvance.mpvex.preferences.AdvancedPreferences
 import app.marlboroadvance.mpvex.preferences.AudioPreferences
 import app.marlboroadvance.mpvex.preferences.BrowserPreferences
@@ -127,6 +130,28 @@ class PlayerActivity :
    * Preferences for subtitle settings.
    */
   private val subtitlesPreferences: SubtitlesPreferences by inject()
+
+  /**
+   * Preferences controlling what the player announces to a screen reader.
+   */
+  private val accessibilityPreferences: AccessibilityPreferences by inject()
+
+  /**
+   * Speaks the current subtitle line through accessibility events.
+   *
+   * Reads the preferences through a lambda so a setting change takes effect on the next cue
+   * instead of on the next playback session.
+   */
+  private val subtitleAnnouncer by lazy {
+    SubtitleAnnouncer(this) {
+      SubtitleAnnounceConfig(
+        enabled = accessibilityPreferences.announceSubtitles.get(),
+        announceSecondary = accessibilityPreferences.announceSecondarySubtitles.get(),
+        interruptOnNewLine = accessibilityPreferences.interruptOnNewSubtitle.get(),
+        onlyWhenSubtitlesVisible = accessibilityPreferences.announceOnlyWhenSubtitlesVisible.get(),
+      )
+    }
+  }
 
   /**
    * Preferences for advanced settings.
@@ -744,6 +769,7 @@ class PlayerActivity :
 
   override fun onStop() {
     runCatching {
+      subtitleAnnouncer.detach()
       pipHelper.onStop()
       if (!isFinishing && !isUserFinishing) {
         saveVideoPlaybackState(fileName)
@@ -774,6 +800,7 @@ class PlayerActivity :
     super.onStart()
 
     runCatching {
+      subtitleAnnouncer.attach(binding.root)
       setupWindowFlags()
       setupSystemUI()
 
@@ -885,6 +912,13 @@ class PlayerActivity :
 
     // Add observer after initialization
     MPVLib.addObserver(playerObserver)
+
+    // Subtitle announcement source. mpv resolves the cue and strips its formatting, so this
+    // works for video, audio files carrying a subtitle track and external subtitle files alike.
+    // Observed unconditionally; [subtitleAnnouncer] decides whether anything is spoken.
+    MPVLib.observeProperty("sub-text", MPVLib.MpvFormat.MPV_FORMAT_STRING)
+    MPVLib.observeProperty("secondary-sub-text", MPVLib.MpvFormat.MPV_FORMAT_STRING)
+    MPVLib.observeProperty("sub-visibility", MPVLib.MpvFormat.MPV_FORMAT_FLAG)
   }
 
   /**
@@ -1480,6 +1514,7 @@ class PlayerActivity :
         }
       }
       "eof-reached" -> handleEndOfFile(value)
+      "sub-visibility" -> subtitleAnnouncer.onSubtitleVisibilityChanged(value)
     }
   }
 
@@ -1624,7 +1659,10 @@ class PlayerActivity :
     property: String,
     value: String,
   ) {
-    // Currently no String properties are handled
+    when (property) {
+      "sub-text" -> subtitleAnnouncer.onPrimaryText(value)
+      "secondary-sub-text" -> subtitleAnnouncer.onSecondaryText(value)
+    }
   }
 
   /**
@@ -1647,6 +1685,7 @@ class PlayerActivity :
   internal fun event(eventId: Int) {
     when (eventId) {
       MPVLib.MpvEvent.MPV_EVENT_FILE_LOADED -> {
+        subtitleAnnouncer.reset()
         handleFileLoaded()
         isReady = true
       }

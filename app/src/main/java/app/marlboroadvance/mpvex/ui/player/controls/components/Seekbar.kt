@@ -55,6 +55,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import app.marlboroadvance.mpvex.accessibility.seekbarAccessibility
 import app.marlboroadvance.mpvex.ui.player.controls.LocalPlayerButtonsClickEvent
 import app.marlboroadvance.mpvex.ui.theme.spacing
 import app.marlboroadvance.mpvex.preferences.SeekbarStyle
@@ -127,7 +128,13 @@ fun SeekbarWithTimers(
         Modifier
           .weight(1f)
           .height(48.dp)
-          .padding(vertical = 8.dp), // Add vertical padding for larger touch area
+          .padding(vertical = 8.dp) // Add vertical padding for larger touch area
+          .seekbarAccessibility(
+            position = if (isUserInteracting) userPosition else position,
+            duration = duration,
+            onSeek = onValueChange,
+            onSeekFinished = onValueChangeFinished,
+          ),
       contentAlignment = Alignment.Center,
     ) {
       // Invisible expanded touch area

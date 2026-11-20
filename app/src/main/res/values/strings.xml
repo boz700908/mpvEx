@@ -507,4 +507,13 @@
   <string name="playlist_refresh_success">Playlist refreshed successfully</string>
   <string name="playlist_refresh_error">Failed to refresh playlist: %s</string>
   <string name="playlist_m3u_badge">M3U</string>
+  <string name="a11y_section_title">Screen reader</string>
+  <string name="pref_a11y_announce_subtitles_title">Read subtitles aloud</string>
+  <string name="pref_a11y_announce_subtitles_summary">Send each subtitle line to the screen reader as an accessibility announcement. Works for video, audio files and external subtitles.</string>
+  <string name="pref_a11y_announce_secondary_title">Read secondary subtitles</string>
+  <string name="pref_a11y_announce_secondary_summary">Also read the second subtitle track in dual-subtitle releases.</string>
+  <string name="pref_a11y_interrupt_title">Replace the line being spoken</string>
+  <string name="pref_a11y_interrupt_summary">Interrupt the previous line instead of queueing behind it, so speech stays in sync with the picture.</string>
+  <string name="pref_a11y_only_when_visible_title">Stay quiet while subtitles are hidden</string>
+  <string name="pref_a11y_only_when_visible_summary">Do not read lines that are not displayed on screen.</string>
 </resources>

@@ -742,7 +742,7 @@ fun PlayerControls(
                       modifier = Modifier
                         .fillMaxSize()
                         .padding(MaterialTheme.spacing.medium),
-                      contentDescription = null,
+                      contentDescription = if (paused == true) "Play" else "Pause",
                       colorFilter = ColorFilter.tint(LocalContentColor.current),
                     )
                   }
@@ -841,7 +841,7 @@ fun PlayerControls(
                     modifier = Modifier
                       .fillMaxSize()
                       .padding(MaterialTheme.spacing.medium),
-                    contentDescription = null,
+                    contentDescription = if (paused == true) "Play" else "Pause",
                     colorFilter = ColorFilter.tint(LocalContentColor.current),
                   )
                 }
