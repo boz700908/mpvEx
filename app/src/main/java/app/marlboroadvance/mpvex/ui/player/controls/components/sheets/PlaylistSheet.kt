@@ -491,7 +491,7 @@ fun PlaylistTrackListItem(
         thumbnail?.let { bmp ->
           Image(
             bitmap = bmp.asImageBitmap(),
-            contentDescription = "Thumbnail",
+            contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
           )
@@ -681,7 +681,7 @@ fun PlaylistTrackGridItem(
         thumbnail?.let { bmp ->
           Image(
             bitmap = bmp.asImageBitmap(),
-            contentDescription = "Thumbnail",
+            contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
           )

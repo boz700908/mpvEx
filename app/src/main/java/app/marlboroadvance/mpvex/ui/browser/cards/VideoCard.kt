@@ -173,7 +173,7 @@ fun VideoCard(
             thumbnail?.let {
               Image(
                 bitmap = it.asImageBitmap(),
-                contentDescription = "Thumbnail",
+                contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
               )
@@ -445,7 +445,7 @@ fun VideoCard(
             thumbnail?.let {
               Image(
                 bitmap = it.asImageBitmap(),
-                contentDescription = "Thumbnail",
+                contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
               )
