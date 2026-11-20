@@ -44,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.marlboroadvance.mpvex.R
-import app.marlboroadvance.mpvex.preferences.AccessibilityPreferences
 import app.marlboroadvance.mpvex.preferences.SubtitlesPreferences
 import app.marlboroadvance.mpvex.preferences.preference.collectAsState
 import app.marlboroadvance.mpvex.presentation.Screen
@@ -75,7 +74,6 @@ object SubtitlesPreferencesScreen : Screen {
     val context = LocalContext.current
     val backstack = LocalBackStack.current
     val preferences = koinInject<SubtitlesPreferences>()
-    val accessibilityPreferences = koinInject<AccessibilityPreferences>()
     val fileManager = koinInject<FileManager>()
 
     Scaffold(
@@ -158,11 +156,6 @@ object SubtitlesPreferencesScreen : Screen {
           // === GENERAL SECTION ===
           item {
             PreferenceSectionHeader(title = stringResource(R.string.general))
-          }
-
-          // === SCREEN READER SECTION ===
-          item {
-            PreferenceSectionHeader(title = stringResource(R.string.a11y_section_title))
           }
 
           item {

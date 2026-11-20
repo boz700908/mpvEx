@@ -395,6 +395,36 @@ object SearchablePreferences {
                 screen = DecoderPreferencesScreen,
             ))
 
+            // Accessibility preferences
+            add(SearchablePreference(
+                titleRes = R.string.pref_accessibility,
+                summaryRes = R.string.pref_accessibility_summary,
+                keywords = listOf("accessibility", "screen reader", "talkback", "blind", "vision"),
+                category = "Accessibility",
+                screen = AccessibilityPreferencesScreen,
+            ))
+            add(SearchablePreference(
+                titleRes = R.string.pref_a11y_announce_subtitles_title,
+                summaryRes = R.string.pref_a11y_announce_subtitles_summary,
+                keywords = listOf("announce", "speak", "subtitle", "screen reader", "talkback", "blind"),
+                category = "Accessibility",
+                screen = AccessibilityPreferencesScreen,
+            ))
+            add(SearchablePreference(
+                titleRes = R.string.pref_a11y_announce_secondary_title,
+                summaryRes = R.string.pref_a11y_announce_secondary_summary,
+                keywords = listOf("secondary", "dual", "subtitle", "announce", "speak"),
+                category = "Accessibility",
+                screen = AccessibilityPreferencesScreen,
+            ))
+            add(SearchablePreference(
+                titleRes = R.string.pref_a11y_only_when_visible_title,
+                summaryRes = R.string.pref_a11y_only_when_visible_summary,
+                keywords = listOf("hidden", "invisible", "subtitle", "quiet", "announce"),
+                category = "Accessibility",
+                screen = AccessibilityPreferencesScreen,
+            ))
+
             // Subtitle preferences
             add(SearchablePreference(
                 titleRes = R.string.pref_subtitles,

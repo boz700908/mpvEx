@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Accessibility
 import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -264,6 +265,27 @@ object PreferencesScreen : Screen {
               
               PreferenceDivider()
               
+              Preference(
+
+                title = { Text(text = stringResource(id = R.string.pref_accessibility)) },
+                summary = {
+                  Text(
+                    text = stringResource(id = R.string.pref_accessibility_summary),
+                    color = MaterialTheme.colorScheme.outline
+                  )
+                },
+                icon = {
+                  Icon(
+                    Icons.Outlined.Accessibility,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                  )
+                },
+                onClick = { backstack.add(AccessibilityPreferencesScreen) },
+              )
+
+              PreferenceDivider()
+
               Preference(
 
                 title = { Text(text = stringResource(id = R.string.pref_subtitles)) },

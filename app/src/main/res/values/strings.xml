@@ -516,4 +516,8 @@
   <string name="pref_a11y_interrupt_summary">Interrupt the previous line instead of queueing behind it, so speech stays in sync with the picture.</string>
   <string name="pref_a11y_only_when_visible_title">Stay quiet while subtitles are hidden</string>
   <string name="pref_a11y_only_when_visible_summary">Do not read lines that are not displayed on screen.</string>
+  <string name="pref_accessibility">Accessibility</string>
+  <string name="pref_accessibility_summary">Screen reader support, spoken subtitles</string>
+  <string name="a11y_reader_detected">Screen reader detected</string>
+  <string name="a11y_reader_not_detected">No screen reader is running right now — announcements are silent</string>
 </resources>
