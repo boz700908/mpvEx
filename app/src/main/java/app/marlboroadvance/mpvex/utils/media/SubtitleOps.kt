@@ -113,9 +113,10 @@ object SubtitleOps : KoinComponent {
       
       // Filter for subtitle files that match the video base name
       val subtitles = files.filter { file ->
-        !file.isDirectory &&
-          isSubtitleFile(file.name) &&
-          file.name.substringBeforeLast('.').startsWith(baseName, ignoreCase = true)
+        if (file.isDirectory || !isSubtitleFile(file.name)) return@filter false
+        val subBase = file.name.substringBeforeLast('.')
+        subBase.startsWith(baseName, ignoreCase = true) ||
+          (subBase.length >= MIN_SUBTITLE_REVERSE_MATCH && baseName.startsWith(subBase, ignoreCase = true))
       }
 
       if (subtitles.isEmpty()) {
@@ -190,9 +191,14 @@ object SubtitleOps : KoinComponent {
 
     val subtitles =
       videoDirectory.listFiles()?.filter { file ->
-        file.isFile &&
-          isSubtitleFile(file.name) &&
-          file.nameWithoutExtension.startsWith(baseName, ignoreCase = true)
+        if (!file.isFile || !isSubtitleFile(file.name)) return@filter false
+        // Two directions matter:
+        //   <media base>.srt   -> per-track subtitle
+        //   RJ123456.vtt       -> one subtitle for a whole album of RJ123456_track01.mp3
+        // The second case is the usual layout for voice works, and a one-way match misses it.
+        val subBase = file.nameWithoutExtension
+        subBase.startsWith(baseName, ignoreCase = true) ||
+          (subBase.length >= MIN_SUBTITLE_REVERSE_MATCH && baseName.startsWith(subBase, ignoreCase = true))
       } ?: emptyList()
 
     if (subtitles.isNotEmpty()) {
@@ -262,4 +268,9 @@ object SubtitleOps : KoinComponent {
       "txt", "pgs"
     )
   }
+
+  /**
+   * Short names such as "1.srt" would otherwise match every file in the folder by prefix.
+   */
+  private const val MIN_SUBTITLE_REVERSE_MATCH = 4
 }
