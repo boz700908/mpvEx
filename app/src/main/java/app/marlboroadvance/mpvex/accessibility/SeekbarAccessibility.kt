@@ -34,6 +34,13 @@ fun Modifier.seekbarAccessibility(
   if (duration <= 0f) return this
 
   val clamped = position.coerceIn(0f, duration)
+
+  // Playback position arrives several times a second. Publishing it raw makes the semantics change
+  // at that rate, and every change makes the accessibility service re-read the tree — with a screen
+  // reader running the player turns into a stutter. A whole second of precision is all a listener
+  // needs from a slider, and it cuts the traffic by the update rate.
+  val progress = (clamped / PROGRESS_GRANULARITY_SECONDS).toInt() * PROGRESS_GRANULARITY_SECONDS
+
   val seekTo: (Float) -> Unit = { seconds ->
     onSeek(seconds.coerceIn(0f, duration))
     onSeekFinished()
@@ -43,7 +50,7 @@ fun Modifier.seekbarAccessibility(
     contentDescription = "Playback position"
     progressBarRangeInfo =
       ProgressBarRangeInfo(
-        current = clamped,
+        current = progress.toFloat(),
         range = 0f..duration,
         steps = (duration / stepSeconds).roundToInt().coerceAtLeast(0),
       )
@@ -68,3 +75,6 @@ fun Modifier.seekbarAccessibility(
       )
   }
 }
+
+/** Only whole seconds are published to accessibility services; see the note in the modifier. */
+private const val PROGRESS_GRANULARITY_SECONDS = 1f
