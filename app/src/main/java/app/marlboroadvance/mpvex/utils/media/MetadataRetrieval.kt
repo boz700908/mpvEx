@@ -251,7 +251,7 @@ object MetadataRetrieval {
             }
 
             val videoFiles = directory.listFiles()?.filter { file ->
-                file.isFile && FileTypeUtils.isVideoFile(file)
+                file.isFile && FileTypeUtils.isMediaFile(file)
             } ?: emptyList()
 
             if (videoFiles.isEmpty()) {

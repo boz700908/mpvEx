@@ -42,6 +42,8 @@ object VideoScanUtils {
         
         // Try MediaStore first (fast)
         scanVideosFromMediaStore(context, folderPath, videosMap)
+        // Audio files live in their own MediaStore table; the browser used to be video-only.
+        scanAudioFromMediaStore(context, folderPath, videosMap)
         
         // Fallback to filesystem if MediaStore returned nothing
         val folder = File(folderPath)
@@ -151,6 +153,98 @@ object VideoScanUtils {
     }
     
     /**
+     * Scan audio files from MediaStore for the same folder.
+     *
+     * Audio rows carry no width/height, so those stay zero and the player simply shows no picture.
+     * Everything else (duration, size, mime) maps onto the same model the list already renders.
+     */
+    private fun scanAudioFromMediaStore(
+        context: Context,
+        folderPath: String,
+        videosMap: MutableMap<String, Video>
+    ) {
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.SIZE,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATE_MODIFIED,
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.MIME_TYPE
+        )
+
+        val normalizedFolder = folderPath.trimEnd('/')
+        val selection = "${MediaStore.Audio.Media.DATA} LIKE ?"
+        val selectionArgs = arrayOf("$normalizedFolder/%")
+
+        try {
+            context.contentResolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                "${MediaStore.Audio.Media.DISPLAY_NAME} ASC"
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+                val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
+                val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val dateModifiedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
+                val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+                val mimeTypeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
+
+                while (cursor.moveToNext()) {
+                    val path = cursor.getString(dataColumn) ?: continue
+                    val file = File(path)
+
+                    // Only direct children of the folder being listed
+                    if (file.parent?.trimEnd('/') != normalizedFolder) continue
+                    if (!file.exists()) continue
+
+                    val id = cursor.getLong(idColumn)
+                    val displayName = cursor.getString(nameColumn) ?: file.name
+                    val size = cursor.getLong(sizeColumn)
+                    val duration = cursor.getLong(durationColumn)
+                    val dateModified = cursor.getLong(dateModifiedColumn)
+                    val dateAdded = cursor.getLong(dateAddedColumn)
+                    val mimeType = cursor.getString(mimeTypeColumn)
+                        ?: FileTypeUtils.getMimeTypeFromExtension(file.extension)
+
+                    videosMap[path] = Video(
+                        id = id,
+                        title = file.nameWithoutExtension,
+                        displayName = displayName,
+                        path = path,
+                        uri = Uri.withAppendedPath(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            id.toString()
+                        ),
+                        duration = duration,
+                        durationFormatted = formatDuration(duration),
+                        size = size,
+                        sizeFormatted = formatFileSize(size),
+                        dateModified = dateModified,
+                        dateAdded = dateAdded,
+                        mimeType = mimeType,
+                        bucketId = folderPath,
+                        bucketDisplayName = File(folderPath).name,
+                        width = 0,
+                        height = 0,
+                        fps = 0f,
+                        resolution = "",
+                        hasEmbeddedSubtitles = false,
+                        subtitleCodec = ""
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "MediaStore audio scan error", e)
+        }
+    }
+
+    /**
      * Scan videos from filesystem (fallback)
      */
     private suspend fun scanVideosFromFileSystem(
@@ -166,7 +260,7 @@ object VideoScanUtils {
                     if (!file.isFile) continue
                     
                     val extension = file.extension.lowercase(Locale.getDefault())
-                    if (!FileTypeUtils.VIDEO_EXTENSIONS.contains(extension)) continue
+                    if (!FileTypeUtils.MEDIA_EXTENSIONS.contains(extension)) continue
                     
                     val path = file.absolutePath
                     if (videosMap.containsKey(path)) continue

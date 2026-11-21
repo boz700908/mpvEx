@@ -207,7 +207,7 @@ class FileSystemBrowserViewModel(
       if (folder.exists() && folder.isDirectory) {
         // Scan all video files in the folder
         val videoFiles = folder.listFiles { file ->
-          file.isFile && FileTypeUtils.isVideoFile(file)
+          file.isFile && FileTypeUtils.isMediaFile(file)
         }
         
         if (!videoFiles.isNullOrEmpty()) {

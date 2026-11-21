@@ -237,7 +237,7 @@ object MediaFileRepository {
           subdirs.add(child)
         }
       } else if (child.isFile) {
-        if (FileTypeUtils.isVideoFile(child)) {
+        if (FileTypeUtils.isMediaFile(child)) {
           videoCount++
           totalSize += child.length()
           val mod = child.lastModified() / 1000
@@ -443,7 +443,7 @@ object MediaFileRepository {
 
             // Fallback for unindexed storage (e.g. OTG/new file not yet indexed by MediaStore)
             if (recursiveCount == 0) {
-              val directVideoCount = file.listFiles { f -> f.isFile && FileTypeUtils.isVideoFile(f) }?.size ?: 0
+              val directVideoCount = file.listFiles { f -> f.isFile && FileTypeUtils.isMediaFile(f) }?.size ?: 0
               if (directVideoCount > 0) {
                 recursiveCount = directVideoCount
               }
@@ -458,7 +458,7 @@ object MediaFileRepository {
             val hasSubfoldersWithVideos = file.listFiles()?.any { child ->
               child.isDirectory && !FileFilterUtils.shouldSkipFolder(child) &&
                 ((cachedRecursiveCounts[child.absolutePath] ?: 0) > 0 ||
-                  child.listFiles { f -> f.isFile && FileTypeUtils.isVideoFile(f) }?.isNotEmpty() == true)
+                  child.listFiles { f -> f.isFile && FileTypeUtils.isMediaFile(f) }?.isNotEmpty() == true)
             } == true
 
             val totalSize = cachedRecursiveSizes[subfolderPath] ?: 0L
